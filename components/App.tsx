@@ -1,10 +1,9 @@
-'use client';
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import SecureInterviewPlatform to prevent SSR issues
 const SecureInterviewPlatform = dynamic(
-  () => import('../components/SecureInterviewPlatform'),
+  () => import('./SecureInterviewPlatform'),
   { 
     ssr: false,
     loading: () => (
@@ -17,7 +16,7 @@ const SecureInterviewPlatform = dynamic(
 
 // Dynamically import AvatarInterviewPage to prevent SSR issues
 const AvatarInterviewPage = dynamic(
-  () => import("../components/AvatarInterviewPage"),
+  () => import("./AvatarInterviewPage"),
   { 
     ssr: false,
     loading: () => (
@@ -45,7 +44,7 @@ interface InterviewData {
   expiresAt: string;
 }
 
-export default function Page() {
+export default function App() {
   const [showAvatar, setShowAvatar] = useState(false);
   const [knowledgeBaseId, setKnowledgeBaseId] = useState<string>("");
 
