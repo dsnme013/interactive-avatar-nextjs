@@ -1,13 +1,10 @@
-// 1. app/api/save-interview/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-
-// In-memory storage (replace with database in production)
-const interviews = new Map();
+import { NextRequest, NextResponse } from "next/server";
+import { interviews } from "@/app/lib/interview-store";
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    
+
     // Store interview data
     interviews.set(data.token, {
       ...data,
@@ -17,16 +14,14 @@ export async function POST(request: NextRequest) {
       accessCount: 0,
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      token: data.token 
+    return NextResponse.json({
+      success: true,
+      token: data.token,
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to save interview' },
-      { status: 500 }
+      { error: "Failed to save interview" },
+      { status: 500 },
     );
   }
 }
-
-// Do NOT export `interviews` here!

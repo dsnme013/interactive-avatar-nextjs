@@ -1,5 +1,5 @@
 // 3. app/api/create-knowledge-base/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,14 +8,14 @@ export async function POST(request: NextRequest) {
     // Generate a mock knowledge base ID
     const knowledgeBaseId = `kb_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       knowledgeBaseId,
-      success: true 
+      success: true,
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to create knowledge base' },
-      { status: 500 }
+      { error: "Failed to create knowledge base" },
+      { status: 500 },
     );
   }
 }

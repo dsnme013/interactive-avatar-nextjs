@@ -1,14 +1,14 @@
 // 2. Candidate Access Page (/app/secure-interview/[token]/page.tsx)
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 
 const AvatarInterviewPage = dynamic(
-  () => import('@/components/AvatarInterviewPage'),
-  { ssr: false }
+  () => import("@/components/AvatarInterviewPage"),
+  { ssr: false },
 );
 
 export default function CandidateInterviewPage() {
@@ -16,7 +16,7 @@ export default function CandidateInterviewPage() {
   const router = useRouter();
   const [interviewData, setInterviewData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     validateAndLoadInterview();
@@ -25,11 +25,11 @@ export default function CandidateInterviewPage() {
   const validateAndLoadInterview = async () => {
     try {
       const response = await fetch(`/api/validate-interview/${params.token}`);
-      
+
       if (!response.ok) {
-        throw new Error('Invalid or expired interview link');
+        throw new Error("Invalid or expired interview link");
       }
-      
+
       const data = await response.json();
       setInterviewData(data);
     } catch (err) {
@@ -71,14 +71,17 @@ export default function CandidateInterviewPage() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-xl font-semibold">
-            Interview for {interviewData.position} at {interviewData.companyName}
+            Interview for {interviewData.position} at{" "}
+            {interviewData.companyName}
           </h1>
-          <p className="text-sm text-gray-600">Candidate: {interviewData.candidateName}</p>
+          <p className="text-sm text-gray-600">
+            Candidate: {interviewData.candidateName}
+          </p>
         </div>
       </div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <AvatarInterviewPage 
+        <AvatarInterviewPage
           knowledgeBaseId={interviewData.knowledgeBaseId}
           interviewData={interviewData}
         />
