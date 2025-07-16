@@ -1,6 +1,16 @@
 import React from "react";
+// Define prop types
+interface KnowledgeBaseConfirmPageProps {
+  kbId: string; // Assuming kbId is a string, adjust if it's another type.
+  onProceed: () => void; // Assuming onProceed is a function that takes no arguments and returns void.
+  onBack: () => void; // Assuming onBack is a function that takes no arguments and returns void.
+}
 
-export default function KnowledgeBaseConfirmPage({ kbId, onProceed, onBack }) {
+export default function KnowledgeBaseConfirmPage({
+  kbId,
+  onProceed,
+  onBack,
+}: KnowledgeBaseConfirmPageProps) {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
       <div className="bg-white rounded shadow-lg p-8 max-w-lg w-full">

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Message } from "./InteractiveAvatar";
 
 interface TranscriptProps {
@@ -11,9 +12,7 @@ export const Transcript: React.FC<TranscriptProps> = ({ messages }) => {
       {messages.map((message, index) => (
         <div
           key={index}
-          className={`mb-2 ${
-            message.isUser ? "text-right" : "text-left"
-          }`}
+          className={`mb-2 ${message.isUser ? "text-right" : "text-left"}`}
         >
           <span
             className={`inline-block p-2 rounded-lg ${

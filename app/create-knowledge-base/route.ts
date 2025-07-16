@@ -3,21 +3,22 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { 
-      candidateName, 
-      companyName, 
-      position, 
-      resumeContent, 
-      jobDescription 
+    const {
+      candidateName,
+      companyName,
+      position,
+      resumeContent,
+      jobDescription,
     } = body;
 
     const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
-    
+
     if (!HEYGEN_API_KEY) {
       console.error("HEYGEN_API_KEY not found in environment variables");
+
       return NextResponse.json(
         { error: "API key not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -98,63 +99,74 @@ IMPORTANT NOTES:
 
     // Call HeyGen API to create knowledge base
     // Note: The exact endpoint might vary based on HeyGen's API version
-    const response = await fetch("https://api.heygen.com/v1/streaming.new_knowledge", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": HEYGEN_API_KEY,
-      },
-      body: JSON.stringify({
-        name: `Interview_${candidateName.replace(/\s+/g, '_')}_${position.replace(/\s+/g, '_')}_${Date.now()}`,
-        description: `AI Interview knowledge base for ${candidateName} applying for ${position} position at ${companyName}`,
-        text: knowledgeContent,
-      }),
-    });
-
-    const responseText = await response.text();
-    console.log("HeyGen API Response:", response.status, responseText);
-
-    if (!response.ok) {
-      // Try alternative endpoint if the first one fails
-      console.log("Trying alternative endpoint...");
-      
-      const altResponse = await fetch("https://api.heygen.com/v1/template.new_knowledge", {
+    const response = await fetch(
+      "https://api.heygen.com/v1/streaming.new_knowledge",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": HEYGEN_API_KEY,
         },
         body: JSON.stringify({
-          name: `Interview_${candidateName}_${position}`,
+          name: `Interview_${candidateName.replace(/\s+/g, "_")}_${position.replace(/\s+/g, "_")}_${Date.now()}`,
+          description: `AI Interview knowledge base for ${candidateName} applying for ${position} position at ${companyName}`,
           text: knowledgeContent,
         }),
-      });
+      },
+    );
+
+    const responseText = await response.text();
+
+    console.log("HeyGen API Response:", response.status, responseText);
+
+    if (!response.ok) {
+      // Try alternative endpoint if the first one fails
+      console.log("Trying alternative endpoint...");
+
+      const altResponse = await fetch(
+        "https://api.heygen.com/v1/template.new_knowledge",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": HEYGEN_API_KEY,
+          },
+          body: JSON.stringify({
+            name: `Interview_${candidateName}_${position}`,
+            text: knowledgeContent,
+          }),
+        },
+      );
 
       if (!altResponse.ok) {
         const altError = await altResponse.text();
+
         console.error("Both API endpoints failed:", responseText, altError);
-        
+
         // Return a demo knowledge base ID for testing
         return NextResponse.json({
           success: true,
           knowledgeBaseId: `demo_kb_${Date.now()}`,
           details: {
             message: "Using demo mode - real API connection failed",
-            error: responseText
-          }
+            error: responseText,
+          },
         });
       }
 
       const altData = await altResponse.json();
+
       return NextResponse.json({
         success: true,
-        knowledgeBaseId: altData.data?.knowledge_id || altData.knowledge_id || altData.id,
-        details: altData
+        knowledgeBaseId:
+          altData.data?.knowledge_id || altData.knowledge_id || altData.id,
+        details: altData,
       });
     }
 
     // Parse the successful response
     let data;
+
     try {
       data = JSON.parse(responseText);
     } catch (e) {
@@ -163,9 +175,9 @@ IMPORTANT NOTES:
     }
 
     // Extract knowledge base ID from response
-    const knowledgeBaseId = 
-      data.data?.knowledge_id || 
-      data.knowledge_id || 
+    const knowledgeBaseId =
+      data.data?.knowledge_id ||
+      data.knowledge_id ||
       data.id ||
       data.kb_id ||
       `kb_${Date.now()}`;
@@ -175,20 +187,19 @@ IMPORTANT NOTES:
     return NextResponse.json({
       success: true,
       knowledgeBaseId: knowledgeBaseId,
-      details: data
+      details: data,
     });
-
   } catch (error) {
     console.error("Error creating knowledge base:", error);
-    
+
     // Return a demo knowledge base ID even on error for testing
     return NextResponse.json({
-      success: true,
+      success: false,
       knowledgeBaseId: `demo_kb_${Date.now()}`,
       details: {
         message: "Using demo mode due to error",
-        error: error.message
-      }
+        error: error instanceof Error ? error.message : String(error),
+      },
     });
   }
 }
@@ -196,32 +207,45 @@ IMPORTANT NOTES:
 // Optional: GET endpoint to check knowledge base status
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const knowledgeId = searchParams.get('id');
-  
+  const knowledgeId = searchParams.get("id");
+
   if (!knowledgeId) {
-    return NextResponse.json({ error: "Knowledge ID required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Knowledge ID required" },
+      { status: 400 },
+    );
   }
 
   const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
-  
+
   if (!HEYGEN_API_KEY) {
-    return NextResponse.json({ error: "API key not configured" }, { status: 500 });
+    return NextResponse.json(
+      { error: "API key not configured" },
+      { status: 500 },
+    );
   }
 
   try {
-    const response = await fetch(`https://api.heygen.com/v1/streaming.list_knowledges`, {
-      method: "GET",
-      headers: {
-        "x-api-key": HEYGEN_API_KEY,
+    const response = await fetch(
+      `https://api.heygen.com/v1/streaming.list_knowledges`,
+      {
+        method: "GET",
+        headers: {
+          "x-api-key": HEYGEN_API_KEY,
+        },
       },
-    });
+    );
 
     const data = await response.json();
+
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch knowledge base", details: error.message },
-      { status: 500 }
+      {
+        error: "Failed to fetch knowledge base",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
     );
   }
 }
